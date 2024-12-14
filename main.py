@@ -1,5 +1,7 @@
 import tcod
 
+from actions import EscapeAction, MovementAction
+from input_handlers import EventHandler
 
 def main() -> None:
     
@@ -15,6 +17,8 @@ def main() -> None:
         "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
     )
 
+    event_handler = EventHandler()
+
     #creating terminal
     with tcod.context.new_terminal(
         screen_width,
@@ -28,11 +32,26 @@ def main() -> None:
         while True:
             root_console.print(x=player_x, y=player_y, string="@")
 
-            context.present(root_console)
             #updates the screen to actually show the player
+            context.present(root_console)
 
+            #removes the last instance of whare the entity was to not leave a trail
+            root_console.clear()
+
+            
+            #input detection
             for event in tcod.event.wait():
-                if event.type == "QUIT":
+                
+                action = event_handler.dispatch(event)
+                
+                if action is None:
+                    continue
+
+                if isinstance(action, MovementAction):
+                    player_x += action.dx
+                    player_y += action.dy
+
+                elif isinstance(action, EscapeAction):
                     raise SystemExit()
 
 
