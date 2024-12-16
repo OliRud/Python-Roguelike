@@ -3,7 +3,6 @@ from typing import Set, Iterable, Any
 from tcod.context import Context
 from tcod.console import Console
 
-from actions import EscapeAction, MovementAction
 from entity import Entity
 from game_map import GameMap
 from input_handlers import EventHandler
@@ -24,12 +23,7 @@ class Engine:
             if action is None:
                 continue
 
-            if isinstance(action, MovementAction):
-                if self.game_map.tiles["walkable"][self.player.x + action.dx, self.player.y + action.dy]:
-                    self.player.move(dx=action.dx, dy=action.dy) #move if there is no wall there
-
-            elif isinstance(action, EscapeAction):
-                raise SystemExit()
+            action.perform(self, self.player)
 
     #handles drawing on the screen
     def render(self, console: Console, context: Context) -> None:
